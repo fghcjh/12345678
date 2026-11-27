@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#080B12">
+<title>忆聊</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="aurora" aria-hidden="true"></div>
+
+<div class="app">
+  <header class="topbar">
+    <button class="icon-btn" id="btnSessions" aria-label="会话列表">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M4 6h16M4 12h16M4 18h10"/>
+      </svg>
+    </button>
+
+    <div class="brand">
+      <div class="logo">忆</div>
+      <div class="brand-text">
+        <h1>忆聊</h1>
+        <p id="brandSub">正在唤醒记忆…</p>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn" id="btnCharacter" aria-label="人格卡">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="3.6"/>
+          <path d="M4.8 20c.9-3.5 3.7-5.3 7.2-5.3s6.3 1.8 7.2 5.3"/>
+        </svg>
+      </button>
+      <button class="pill-btn" id="btnMemory">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+          <path d="M12 3.4l1.9 5.4 5.4 1.9-5.4 1.9-1.9 5.4-1.9-5.4L4.7 10.7l5.4-1.9L12 3.4Z"/>
+          <path d="M18.3 15.8l.75 2.05 2.05.75-2.05.75-.75 2.05-.75-2.05-2.05-.75 2.05-.75.75-2.05Z" opacity=".85"/>
+        </svg>
+        <span id="memCount">0</span>
+      </button>
+      <button class="icon-btn" id="btnSettings" aria-label="设置">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="chat" id="chat">
+    <div class="empty" id="empty">
+      <div class="empty-glow"></div>
+      <p class="empty-kicker" id="greetKicker">MEMORY · CHAT</p>
+      <h2 class="empty-title" id="greet">晚上好</h2>
+      <p class="empty-sub">我会记住你说过的事，<br>聊得越久，越像认识你。</p>
+      <div class="key-banner" id="keyBanner" hidden>
+        <div>
+          <strong>还差一步</strong>
+          <span>填入 DeepSeek API Key 就能开始聊天</span>
+        </div>
+        <button class="mini-btn" id="keyBannerBtn">去设置</button>
+      </div>
+      <div class="chips" id="chips">
+        <button class="chip" data-q="记住：我对咖啡因敏感，晚上别推荐咖啡。">
+          <span class="chip-ico">☕️</span><span>记住我的咖啡禁忌</span>
+        </button>
+        <button class="chip" data-q="根据你对我的了解，帮我安排今晚的两小时。">
+          <span class="chip-ico">🌙</span><span>按我的习惯排今晚</span>
+        </button>
+        <button class="chip" data-q="你还记得关于我的哪些事？简单说说。">
+          <span class="chip-ico">🧠</span><span>你还记得我什么？</span>
+        </button>
+        <button class="chip" data-q="我们之前聊过什么？帮我理一下。">
+          <span class="chip-ico">🧵</span><span>梳理一下之前聊的</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <div class="avatar-stage" id="avatarStage" hidden>
+    <div class="av-figure" id="avFigure" role="button" aria-label="虚拟形象">
+      <canvas id="avCanvas"></canvas>
+      <img id="avImg" alt="" hidden>
+      <canvas id="av3d" class="av3d" hidden></canvas>
+    </div>
+  </div>
+
+  <button class="scroll-down" id="scrollDown" aria-label="回到底部">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+  </button>
+
+  <div class="attach-menu" id="attachMenu" hidden>
+    <button data-act="camera"><span class="am-ico">📷</span><span>拍一张，让我看看</span></button>
+    <button data-act="video"><span class="am-ico">🎬</span><span>录一段（≤30 秒）</span></button>
+    <button data-act="gallery"><span class="am-ico">🖼</span><span>从相册里选</span></button>
+    <button data-act="call"><span class="am-ico">🎥</span><span>视频通话（实时看）</span></button>
+  </div>
+
+  <div class="voice-bar" id="voiceBar" hidden>
+    <span class="v-dot"></span>
+    <span id="voiceLabel">正在听…</span>
+    <button id="voiceCancel">取消</button>
+  </div>
+
+  <div class="attach-preview" id="attachPreview" hidden>
+    <img id="attachThumb" alt="">
+    <div class="attach-meta">
+      <div class="attach-kind" id="attachKind">图片</div>
+      <div class="attach-name" id="attachName">已选择</div>
+    </div>
+    <button class="attach-x" id="attachRemove" aria-label="移除附件">×</button>
+  </div>
+
+  <footer class="composer">
+    <button class="attach-btn" id="btnAttach" aria-label="添加图片或视频">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="5" width="18" height="14" rx="3"/>
+        <circle cx="8.6" cy="10" r="1.6"/>
+        <path d="m4 17 5.4-5.4 4 4L17 12l3 3"/>
+      </svg>
+    </button>
+    <div class="input-shell">
+      <textarea id="input" rows="1" placeholder="说点什么…" enterkeyhint="send"></textarea>
+    </div>
+    <button class="mic-btn" id="btnVoice" aria-label="语音输入">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="3" width="6" height="11" rx="3"/>
+        <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+      </svg>
+    </button>
+    <button class="send-btn" id="btnSend" aria-label="发送">
+      <svg class="ico-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg>
+      <svg class="ico-stop" viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="7" width="10" height="10" rx="2.5"/></svg>
+    </button>
+  </footer>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- 会话 -->
+<section class="sheet" id="sheetSessions">
+  <div class="sheet-grab"></div>
+  <div class="sheet-head">
+    <h3>对话</h3>
+    <button class="mini-btn accent" id="btnNewChat">新对话</button>
+    <button class="icon-btn sm" data-close aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body" id="sessionList"></div>
+</section>
+
+<!-- 记忆库 -->
+<section class="sheet tall" id="sheetMemory">
+  <div class="sheet-grab"></div>
+  <div class="sheet-head">
+    <h3>记忆库 <span class="count" id="memSheetCount">0</span></h3>
+    <button class="icon-btn sm" data-close aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="search-row">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="memSearch" type="search" placeholder="搜索记忆内容或类型" autocomplete="off">
+  </div>
+  <div class="sheet-body" id="memList"></div>
+</section>
+
+<!-- 设置 -->
+<section class="sheet tall" id="sheetSettings">
+  <div class="sheet-grab"></div>
+  <div class="sheet-head">
+    <h3>设置</h3>
+    <button class="icon-btn sm" data-close aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body settings">
+
+    <div class="section-label">模型接口</div>
+    <div class="field">
+      <label for="fKey">API Key</label>
+      <div class="input-row">
+        <input id="fKey" type="password" placeholder="sk-…" autocomplete="off" spellcheck="false">
+        <button class="ghost-icon" id="toggleKey" aria-label="显示">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>
+        </button>
+      </div>
+      <p class="hint">只保存在本机，直接用 DeepSeek 官方 Key 即可。</p>
+    </div>
+    <div class="field">
+      <label for="fBase">Base URL</label>
+      <input id="fBase" type="url" placeholder="https://api.deepseek.com" spellcheck="false" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="fModel">模型</label>
+      <input id="fModel" type="text" placeholder="deepseek-chat" spellcheck="false" autocomplete="off">
+      <div class="quick-chips" id="modelChips">
+        <button data-model="deepseek-flash">deepseek-flash</button>
+        <button data-model="deepseek-v4-pro">deepseek-v4-pro</button>
+        <button data-model="deepseek-chat">deepseek-chat（旧）</button>
+      </div>
+    </div>
+
+    <div class="section-label">角色</div>
+    <button class="card-link" id="openCharacter">
+      <div class="persona-avatar" id="cardAvatar">忆</div>
+      <div class="card-main">
+        <div class="card-name" id="cardName">忆聊</div>
+        <div class="card-line" id="cardLine">会记住你说过的每件事</div>
+      </div>
+      <span class="chev">›</span>
+    </button>
+
+    <button class="card-link" id="openAvatar">
+      <div class="av-chip" id="avatarChip">
+        <canvas id="avChipCanvas" width="40" height="52"></canvas>
+        <img id="avChipImg" alt="" hidden>
+      </div>
+      <div class="card-main">
+        <div class="card-name" id="avatarName">虚拟形象</div>
+        <div class="card-line" id="avatarLine">还没有：上传一张，或自己捏一个</div>
+      </div>
+      <span class="chev">›</span>
+    </button>
+
+    <button class="card-link" id="openGrow">
+      <div class="persona-avatar" id="growCardIcon">✦</div>
+      <div class="card-main">
+        <div class="card-name">成长与日常</div>
+        <div class="card-line" id="growCardLine">让她慢慢变 · 按作息主动开口</div>
+      </div>
+      <span class="chev">›</span>
+    </button>
+
+    <button class="card-link" id="openMarket">
+      <div class="persona-avatar" id="marketIcon">🧩</div>
+      <div class="card-main">
+        <div class="card-name">插件市场</div>
+        <div class="card-line" id="marketLine">人格卡 / 世界书，点一下装进来</div>
+      </div>
+      <span class="chev">›</span>
+    </button>
+
+    <div class="section-label">记忆</div>
+    <div class="field row">
+      <div>
+        <label>长期记忆</label>
+        <p class="hint">每轮自动抽取值得记住的事实</p>
+      </div>
+      <button class="switch" id="swMemory" aria-label="长期记忆"><span></span></button>
+    </div>
+    <div class="field">
+      <label for="fEvery">抽取频率</label>
+      <select id="fEvery">
+        <option value="1">每轮对话</option>
+        <option value="2">每 2 轮</option>
+        <option value="3">每 3 轮</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="fTopK">每次召回条数 <b id="topKVal">6</b></label>
+      <input id="fTopK" type="range" min="2" max="12" step="1" value="6">
+    </div>
+
+    <div class="section-label">视觉识别</div>
+    <p class="hint" style="margin:-2px 2px 10px">图片 / 动图 / 视频会先交给一个看图模型识别成文字，再进对话和记忆。留空时，DeepSeek 用户自动用 <b>deepseek-flash</b>（你现有的 Key 就能用）；想完全免费可以填智谱 <b>glm-4v-flash</b>。</p>
+    <div class="field">
+      <label for="fVisBase">Base URL</label>
+      <input id="fVisBase" type="url" placeholder="留空 = 跟随聊天接口（DeepSeek）" spellcheck="false" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="fVisModel">视觉模型</label>
+      <input id="fVisModel" type="text" placeholder="留空 = deepseek-flash" spellcheck="false" autocomplete="off">
+      <div class="quick-chips" id="visionChips">
+        <button data-base="https://api.deepseek.com" data-model="deepseek-flash">DeepSeek</button>
+        <button data-base="https://open.bigmodel.cn/api/paas/v4" data-model="glm-4v-flash">智谱（免费）</button>
+        <button data-base="https://dashscope.aliyuncs.com/compatible-mode/v1" data-model="qwen-vl-plus">通义 qwen-vl</button>
+        <button data-base="https://api.siliconflow.cn/v1" data-model="Qwen/Qwen2.5-VL-7B-Instruct">SiliconFlow</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="fVisKey">视觉 Key（和聊天同一家可留空）</label>
+      <input id="fVisKey" type="password" autocomplete="off" spellcheck="false">
+    </div>
+    <p class="hint">视频只识别画面：抽 4 帧拼成一张带时间标注的图，不含声音。动图同理。</p>
+
+    <details class="advanced">
+      <summary>高级：语义向量接口（可选）</summary>
+      <p class="hint">不填就用离线字符向量，中文短句够用；填了 OpenAI 兼容的 /embeddings 接口可获得跨说法召回。</p>
+      <div class="field">
+        <label for="fEmbBase">Embedding Base URL</label>
+        <input id="fEmbBase" type="url" placeholder="https://api.siliconflow.cn/v1" spellcheck="false" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="fEmbModel">Embedding 模型</label>
+        <input id="fEmbModel" type="text" placeholder="BAAI/bge-m3" spellcheck="false" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="fEmbKey">Embedding Key（留空复用上面的）</label>
+        <input id="fEmbKey" type="password" autocomplete="off" spellcheck="false">
+      </div>
+      <button class="mini-btn" id="btnReindex">重建全部记忆向量</button>
+    </details>
+
+    <div class="section-label">语音</div>
+
+    <div class="voice-block">
+      <div class="voice-head">
+        <span>听（语音转文字）</span>
+        <span class="voice-left" id="asrLeft">今天还能 200 条</span>
+      </div>
+      <div class="quick-chips" id="asrChips">
+        <button data-preset="deepseek">DeepSeek</button>
+        <button data-preset="openai">OpenAI 兼容</button>
+        <button data-preset="dashscope">阿里百炼</button>
+        <button data-preset="minimax">MiniMax</button>
+      </div>
+      <div class="field">
+        <label for="fAsrBase">接口地址</label>
+        <input id="fAsrBase" type="url" placeholder="留空 = DeepSeek /tools/asr" spellcheck="false" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="fAsrKey">API Key</label>
+        <input id="fAsrKey" type="password" placeholder="留空复用聊天 Key" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="field">
+        <label for="fAsrModel">模型</label>
+        <input id="fAsrModel" type="text" placeholder="留空 = DeepSeek 内置；如 whisper-1" spellcheck="false" autocomplete="off">
+      </div>
+      <div class="field row">
+        <label for="fAsrLimit">每天最多</label>
+        <div class="num-row"><input id="fAsrLimit" type="number" min="1" max="9999" value="200"><span>条</span></div>
+      </div>
+    </div>
+
+    <div class="voice-block">
+      <div class="voice-head">
+        <span>说（文字转语音）</span>
+        <span class="voice-left" id="ttsLeft">今天还能 200 条</span>
+      </div>
+      <div class="quick-chips" id="ttsChips">
+        <button data-preset="system">系统 TTS</button>
+        <button data-preset="openai">OpenAI 兼容</button>
+        <button data-preset="volcano">火山引擎</button>
+        <button data-preset="minimax">MiniMax</button>
+        <button data-preset="mimo">小米 MiMo</button>
+      </div>
+      <div class="field">
+        <label for="fTtsBase">接口地址</label>
+        <input id="fTtsBase" type="url" placeholder="留空 = 系统 TTS" spellcheck="false" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="fTtsKey">API Key</label>
+        <input id="fTtsKey" type="password" placeholder="留空复用聊天 Key" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="field">
+        <label for="fTtsModel">模型</label>
+        <input id="fTtsModel" type="text" placeholder="如 tts-1 / speech-01" spellcheck="false" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="fTtsVoice">音色</label>
+        <input id="fTtsVoice" type="text" placeholder="alloy / male-qn-qingse …" spellcheck="false" autocomplete="off">
+      </div>
+      <div class="field row">
+        <label for="fTtsLimit">每天最多</label>
+        <div class="num-row"><input id="fTtsLimit" type="number" min="1" max="9999" value="200"><span>条</span></div>
+      </div>
+    </div>
+
+    <div class="field row">
+      <div>
+        <label>自动朗读回复</label>
+        <p class="hint">回复生成后自动念出来</p>
+      </div>
+      <button class="switch" id="swSpeak" aria-label="自动朗读"><span></span></button>
+    </div>
+    <p class="hint">输入框右边的麦克风：点一下开始说，再点一下结束；转成文字后自动发送。填了自定义接口就用那边的 ASR / TTS，留空走 DeepSeek 转写 + 系统朗读。</p>
+
+    <div class="section-label">维护</div>
+    <p class="hint" id="testHint"></p>
+    <div class="btn-row">
+      <button class="mini-btn" id="btnTest">测试连接</button>
+      <button class="mini-btn" id="btnExport">导出数据</button>
+      <button class="mini-btn danger" id="btnWipe">清空全部</button>
+    </div>
+    <p class="hint foot">忆聊 4.8 · 数据只存本机 · 记忆会在后台悄悄更新</p>
+  </div>
+  <div class="sheet-foot">
+    <button class="primary-btn" id="btnSave">保存设置</button>
+  </div>
+</section>
+
+<!-- 人格卡 -->
+<section class="sheet tall" id="sheetCharacter">
+  <div class="sheet-grab"></div>
+  <div class="sheet-head">
+    <h3>人格卡</h3>
+    <button class="icon-btn sm" data-close aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body">
+    <div class="persona-preview">
+      <div class="persona-avatar" id="charAvatar">忆</div>
+      <div class="persona-preview-main">
+        <div class="persona-name" id="charNamePrev">忆聊</div>
+        <div class="persona-line" id="charLinePrev">会记住你说过的每件事</div>
+      </div>
+    </div>
+
+    <details class="section" open>
+      <summary>基础</summary>
+      <div class="field">
+        <label for="cName">名字</label>
+        <input id="cName" type="text" maxlength="24" placeholder="忆聊" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="cLine">一句话人设</label>
+        <textarea id="cLine" rows="2" maxlength="200" placeholder="表面温柔笨拙、内心坚强"></textarea>
+      </div>
+      <div class="field">
+        <label for="cWho">TA 是谁</label>
+        <textarea id="cWho" rows="4" placeholder="身份、来历、现在在做什么…"></textarea>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary>性格与想法</summary>
+      <div class="field">
+        <label for="cPersonality">性格</label>
+        <textarea id="cPersonality" rows="4" placeholder="外在……内心……害怕……"></textarea>
+      </div>
+      <div class="field">
+        <label for="cWorldview">看事情的方式</label>
+        <textarea id="cWorldview" rows="3" placeholder="遇到事情先考虑谁、怎么看过去…"></textarea>
+      </div>
+      <div class="field">
+        <label for="cMood">不同心情下怎么说话</label>
+        <textarea id="cMood" rows="3" placeholder="开心时…难过时…生气时…"></textarea>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary>日常与说话</summary>
+      <div class="field">
+        <label for="cChannels">平时在哪聊</label>
+        <input id="cChannels" type="text" maxlength="200" placeholder="QQ 群或私聊" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="cSchedule">作息</label>
+        <textarea id="cSchedule" rows="2" placeholder="和我同步，晚上等我睡了才睡…"></textarea>
+      </div>
+      <div class="field">
+        <label for="cExamples">说话示例</label>
+        <textarea id="cExamples" rows="4" placeholder="对方：好累。&#10;TA：辛苦了…我帮你泡了茶，要不要歇会儿？"></textarea>
+      </div>
+      <div class="field">
+        <label for="cGreeting">开场白（每个新对话的第一句）</label>
+        <textarea id="cGreeting" rows="3" placeholder="你来啦！文件我已经整理好放在桌上了…"></textarea>
+      </div>
+      <div class="field">
+        <label for="cPerTurn">每轮提醒（硬性要求）</label>
+        <textarea id="cPerTurn" rows="3" placeholder="保持温柔怯生生的语气，自称「我」，叫对方「提督」，每次回复 1-2 句短句。"></textarea>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary>世界书 <span class="count" id="wbCount">0</span></summary>
+      <p class="hint" style="margin:2px 0 10px">对话里出现关键词时，自动把对应设定塞进上下文。关键词用「，」分隔，最多 30 条。</p>
+      <div id="wbList"></div>
+      <button class="mini-btn" id="wbAdd" style="margin-bottom:14px">+ 加一条</button>
+    </details>
+  </div>
+  <div class="sheet-foot">
+    <button class="primary-btn" id="btnSaveChar">保存人格卡</button>
+  </div>
+</section>
+
+<div class="call" id="callScreen" hidden>
+  <video id="callVideo" autoplay muted playsinline></video>
+  <canvas class="call-pip" id="callPip" hidden></canvas>
+  <div class="call-stage" id="callStage" hidden>
+    <div class="call-stage-glow"></div>
+  </div>
+  <div class="call-top">
+    <div class="call-pill"><i></i><span id="callTime">00:00</span><span id="callFrames">0 帧</span></div>
+    <button class="call-end" id="callEnd">挂断</button>
+  </div>
+  <div class="call-bottom">
+    <div class="call-sub" id="callSub">正在打开摄像头…</div>
+    <div class="call-actions">
+      <button class="call-tool" id="callMic">🎙 语音对话</button>
+      <button class="call-tool on" id="callVoice">🔊 朗读</button>
+      <button class="call-tool" id="callBody">🧍 全身</button>
+      <button class="call-tool" id="callFlip">翻转镜头</button>
+    </div>
+  </div>
+</div>
+
+<!-- 虚拟形象 -->
+<section class="sheet tall" id="sheetAvatar">
+  <div class="sheet-grab"></div>
+  <div class="sheet-head">
+    <h3>虚拟形象</h3>
+    <button class="icon-btn sm" data-close aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body settings">
+
+    <div class="av-stage" id="avStage">
+      <div class="av-stage-glow"></div>
+      <canvas id="avPreview" width="200" height="260"></canvas>
+      <img id="avPreviewImg" alt="" hidden>
+      <div class="av-stage-empty" id="avEmpty">还没有形象</div>
+    </div>
+
+    <p class="hint" id="avSaved" style="margin:-4px 2px 8px"></p>
+
+    <div class="section-label">从哪来</div>
+    <div class="btn-row">
+      <button class="mini-btn" id="btnAvUploadModel">上传 3D 模型</button>
+      <button class="mini-btn" id="btnAvUpload">上传图片</button>
+      <button class="mini-btn" id="btnAvMake">自己捏</button>
+      <button class="mini-btn" id="btnAvRandom">随一个</button>
+    </div>
+    <p class="hint" id="avModelHint">3D 模型要 <b>.vrm</b>（VRM 0.x / 1.0）或 <b>.glb</b>。网店卖的 VRChat 模型是 unitypackage，App 读不了，得先用 Unity + UniVRM 导出成 .vrm。</p>
+    <p class="hint">图片：透明背景 PNG 最合适，长边 800～1200px。自己捏：纯矢量小人，最省事。</p>
+
+    <div class="av-presets" id="avPresets"></div>
+
+    <div class="av-editor" id="avEditor" hidden>
+      <div class="av-field">
+        <label>发型</label>
+        <div class="chips-line" id="avHairStyles"></div>
+      </div>
+      <div class="av-field">
+        <label>发色</label>
+        <div class="sw-line" id="avHairColors"></div>
+      </div>
+      <div class="av-field">
+        <label>眼睛</label>
+        <div class="sw-line" id="avEyes"></div>
+      </div>
+      <div class="av-field">
+        <label>肤色</label>
+        <div class="sw-line" id="avSkins"></div>
+      </div>
+      <div class="av-field">
+        <label>衣服</label>
+        <div class="sw-line" id="avCloth"></div>
+      </div>
+      <div class="av-field">
+        <label>配饰</label>
+        <div class="chips-line" id="avAccs"></div>
+      </div>
+    </div>
+
+    <div class="section-label">动作</div>
+    <div class="chips-line" id="avActions"></div>
+    <p class="hint">点一下就做。3D 模型才有动作；聊天页点一下 TA 也会被戳到，长按 0.7 秒打开这个面板。</p>
+
+    <div class="btn-row">
+      <button class="mini-btn" id="btnAnimImport">导入 .vrma 动作</button>
+      <button class="mini-btn" id="btnAnimPlay">播放</button>
+      <button class="mini-btn" id="btnAnimClear">清掉</button>
+    </div>
+    <p class="hint" id="animInfo">还没导入动作文件。支持 VRM Animation（.vrma），只取骨骼旋转；导入后点「播放」试一次。</p>
+
+    <button class="mini-btn" id="btnRefit">重新调整站姿</button>
+    <p class="hint">导入模型时已经自动做过：身高不在 0.9～2.2m 的按 1.5m 归一、水平居中对齐、手臂放下。模型歪了或躺平了可以点这里再修一次。</p>
+
+    <div class="section-label">怎么显示</div>
+    <div class="field row">
+      <div>
+        <label>聊天页显示</label>
+        <p class="hint">关掉只是藏起来，配置还留着</p>
+      </div>
+      <button class="switch" id="swAvShow" aria-label="聊天页显示"><span></span></button>
+    </div>
+    <div class="field">
+      <label>大小</label>
+      <div class="quick-chips" id="avSizes">
+        <button data-size="sm">小</button>
+        <button data-size="md">中</button>
+        <button data-size="lg">大</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>位置</label>
+      <div class="quick-chips" id="avSides">
+        <button data-side="right">右下</button>
+        <button data-side="left">左下</button>
+      </div>
+    </div>
+    <div class="field row">
+      <div>
+        <label>说话时动起来</label>
+        <p class="hint">朗读、语音通话时眨眼和动嘴</p>
+      </div>
+      <button class="switch" id="swAvTalk" aria-label="说话动画"><span></span></button>
+    </div>
+
+    <button class="mini-btn danger" id="btnAvClear">不用形象</button>
+    <p class="hint foot">自己捏的形象是实时画出来的矢量小人，不占存储，还能眨眼、动嘴。</p>
+  </div>
+  <div class="sheet-foot">
+    <button class="primary-btn" id="btnAvSave">保存形象</button>
+  </div>
+</section>
+
+<!-- 成长 / 主动开口 -->
+<section class="sheet tall" id="sheetGrow">
+  <div class="sheet-grab"></div>
+  <div class="sheet-head">
+    <h3>成长与日常</h3>
+    <button class="icon-btn sm" data-close aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body settings">
+    <div class="seg" id="growTabs">
+      <button type="button" data-tab="grow" class="on">成长</button>
+      <button type="button" data-tab="daily">主动开口</button>
+    </div>
+
+    <div id="paneGrow">
+      <div class="field row">
+        <div>
+          <label>让她慢慢变</label>
+          <p class="hint">聊得多了，从对话里长出新的性格倾向</p>
+        </div>
+        <button class="switch" id="swGrow" aria-label="让她慢慢变"><span></span></button>
+      </div>
+      <div class="field row">
+        <div>
+          <label>证据够了直接生效</label>
+          <p class="hint">同一件事出现两次以上，自动写进人格</p>
+        </div>
+        <button class="switch" id="swGrowAuto" aria-label="自动生效"><span></span></button>
+      </div>
+      <p class="hint" id="growHint">还没有。聊得多了才会慢慢有；也可以自己加一条。</p>
+      <div id="traitList" class="trait-list"></div>
+
+      <div class="section-label">自己加一条</div>
+      <div class="field">
+        <select id="traitKind">
+          <option>性格</option>
+          <option>习惯</option>
+          <option>偏好</option>
+          <option>关系</option>
+        </select>
+      </div>
+      <div class="field">
+        <input id="traitText" type="text" maxlength="40" placeholder="一句话，比如「雨夜会格外安静」" autocomplete="off">
+      </div>
+      <div class="btn-row">
+        <button class="mini-btn accent" id="btnTraitAdd">加上</button>
+        <button class="mini-btn" id="btnGrowNow">现在抽一次</button>
+      </div>
+    </div>
+
+    <div id="paneDaily" hidden>
+      <div class="field row">
+        <div>
+          <label>主动开口</label>
+          <p class="hint">满足条件时，TA 会自己先说话</p>
+        </div>
+        <button class="switch" id="swProactive" aria-label="主动开口"><span></span></button>
+      </div>
+
+      <div class="section-label">作息</div>
+      <div class="sched-grid" id="schedGrid"></div>
+      <div class="btn-row">
+        <button class="mini-btn" id="btnGenSchedule">按人格卡重排</button>
+      </div>
+
+      <div class="field">
+        <label>每天最多 <b id="pmaxVal">10</b> 次</label>
+        <input id="pmax" type="range" min="1" max="30" step="1" value="10">
+      </div>
+      <div class="field">
+        <label>时段</label>
+        <div class="num-row">
+          <input id="pstart" type="number" min="0" max="23" value="8"><span>点 —</span>
+          <input id="pend" type="number" min="1" max="24" value="24"><span>点</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>空闲多久后</label>
+        <div class="num-row">
+          <input id="pidle" type="number" min="1" max="72" value="6"><span>小时</span>
+        </div>
+      </div>
+      <p class="hint" id="proactiveHint">今天还 10 次</p>
+      <p class="hint">App 关着也能叫醒：系统会在「空闲时间到了 + 在时段内」时把它唤醒一次，生成一句并推到通知栏。Android 13 以上第一次开启会让你允许通知。</p>
+    </div>
+  </div>
+  <div class="sheet-foot">
+    <button class="primary-btn" id="btnGrowSave">保存</button>
+  </div>
+</section>
+
+<!-- 插件市场 -->
+<section class="sheet tall" id="sheetMarket">
+  <div class="sheet-grab"></div>
+  <div class="sheet-head">
+    <h3>插件市场</h3>
+    <button class="mini-btn" id="btnMarketRefresh">刷新</button>
+    <button class="icon-btn sm" data-close aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body settings">
+    <div class="seg" id="marketTabs">
+      <button type="button" data-tab="all" class="on">全部</button>
+      <button type="button" data-tab="persona">人格卡</button>
+      <button type="button" data-tab="worldbook">世界书</button>
+      <button type="button" data-tab="installed">已装</button>
+    </div>
+    <div id="marketList" class="market-list"></div>
+
+    <details class="advanced">
+      <summary>换成自己的市场地址</summary>
+      <p class="hint">填一个返回同样格式 JSON 的地址（https）。留空就只用内置目录。</p>
+      <div class="field">
+        <input id="marketUrl" type="url" placeholder="https://example.com/market.json" spellcheck="false" autocomplete="off">
+      </div>
+      <button class="mini-btn" id="btnMarketUrl">保存地址并刷新</button>
+    </details>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script src="avatar.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

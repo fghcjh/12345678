@@ -1,0 +1,16 @@
+# 构建产物
+build/
+*.apk
+*.apk.idsig
+# 签名文件：绝不要进公开仓库（口令在 build.sh 里）
+*.keystore
+*.jks
+
+# 本地预览 / 系统垃圾
+.DS_Store
+*.log
+
+# 截图里出现的第三方付费模型，不随公开仓库发布
+screenshots/cian.png
+screenshots/call-3d.png
+screenshots/avatar3d.png
