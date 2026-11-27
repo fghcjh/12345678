@@ -2,7 +2,7 @@
 
 一个能接 AI 聊天、**真的会记住你**、能捏出完整人格、还能看懂图片和视频的 Android App。直连 DeepSeek（或任意 OpenAI 兼容接口），对话流式输出，记忆和人格都存在本地，越聊越像你设定的那个 TA。
 
-- 安装包：[`memochat.apk`](memochat.apk)（约 354 KB，minSdk 24 / targetSdk 34）
+- 安装包：见 [Releases](../../releases)（约 386 KB，minSdk 24 / targetSdk 34）；也可以自己 `./build.sh` 出一个
 - 纯本地数据：消息、记忆、人格卡、API Key 都只在这台手机上
 - 无 Gradle、无第三方 SDK：JDK + aapt2 + d8 手工构建，依赖为零
 
