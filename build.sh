@@ -13,11 +13,11 @@ KS=${KS:-memochat.keystore}
 PASS=${PASS:-memochat123}
 ALIAS=${ALIAS:-memochat}
 
-# 有 ANDROID_HOME / JAVA_HOME 时按标准 SDK 布局自动找
+# 有 ANDROID_HOME / JAVA_HOME 时按标准 SDK 布局自动找（本机默认路径不存在才覆盖）
 if [ -n "$ANDROID_HOME" ]; then
-  : "${BT:=$(ls -d "$ANDROID_HOME"/build-tools/* 2>/dev/null | tail -1)}"
-  : "${AJAR:=$(ls "$ANDROID_HOME"/platforms/*/android.jar 2>/dev/null | tail -1)}"
-  : "${LIB:=$(dirname "$(ls "$ANDROID_HOME"/build-tools/*/lib/d8.jar 2>/dev/null | tail -1)")}"
+  [ -x "$BT/aapt2" ] || BT=$(ls -d "$ANDROID_HOME"/build-tools/*/ 2>/dev/null | sort -V | tail -1)
+  [ -e "$AJAR" ] || AJAR=$(ls "$ANDROID_HOME"/platforms/*/android.jar 2>/dev/null | sort -V | tail -1)
+  [ -e "$LIB/d8.jar" ] || LIB=$(dirname "$(ls "$ANDROID_HOME"/build-tools/*/lib/d8.jar 2>/dev/null | sort -V | tail -1)")
 fi
 if [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/javac" ]; then
   JDK="$JAVA_HOME"

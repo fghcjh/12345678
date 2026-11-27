@@ -17,10 +17,22 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: 安装 Android SDK 组件
+      - name: 安装 Android 命令行工具
+        run: |
+          mkdir -p "$HOME/android-sdk/cmdline-tools"
+          cd "$HOME/android-sdk/cmdline-tools"
+          curl -sSLo tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip -q tools.zip
+          mv cmdline-tools latest
+          rm tools.zip
+          echo "ANDROID_HOME=$HOME/android-sdk" >> "$GITHUB_ENV"
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+
+      - name: 安装 platform 与 build-tools
         run: |
           yes | sdkmanager --licenses > /dev/null 2>&1 || true
           sdkmanager "platforms;android-34" "build-tools;34.0.0"
+          ls "$ANDROID_HOME/build-tools" "$ANDROID_HOME/platforms"
 
       - name: 构建（aapt2 + javac + d8 + apksigner）
         run: |
